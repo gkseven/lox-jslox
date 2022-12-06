@@ -1,5 +1,3 @@
-/*READ EVAL PRINT LOOP*/
-
 import * as readline from 'node:readline';
 import { readFileSync } from 'node:fs';
 
