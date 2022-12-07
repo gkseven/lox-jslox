@@ -3,8 +3,13 @@ class Token {
   lexeme: string;
   literal: any;
   line: number;
-  
-  constructor(type: TokenType, lexeme: string, literal: string | number | null, line: number) {
+
+  constructor(
+    type: TokenType,
+    lexeme: string,
+    literal: string | number | null | undefined,
+    line: number
+  ) {
     this.type = type;
     this.lexeme = lexeme;
     this.literal = literal;
