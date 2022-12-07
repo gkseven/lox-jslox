@@ -1,15 +1,15 @@
 import * as readline from 'node:readline';
 import { readFileSync } from 'node:fs';
-import Scanner  from './Scanner';
+import Scanner from './Scanner';
 
 class Lox {
-  hadError:boolean = false;
+  static hadError: boolean = false;
 
   runFile(filepath: string): void {
     try {
       const fileContents = readFileSync(filepath);
       this.run(fileContents.toString());
-      if (this.hadError) process.exit(65);
+      if (Lox.hadError) process.exit(65);
     } catch (error) {
       const errMsg = (error as Error).message;
       console.error(errMsg);
@@ -26,7 +26,7 @@ class Lox {
     rl.prompt();
     rl.on('line', (line) => {
       this.run(line);
-      this.hadError = false;
+      Lox.hadError = false;
       rl.prompt();
     });
   }
@@ -40,11 +40,10 @@ class Lox {
     }
   }
 
-  reportError(line:number, where:string, message:string){
+  static reportError(line: number, where?: string, message?: string) {
     console.error(`[line: ${line} Error ${where} : ${message}`);
     this.hadError = true;
   }
-
 }
 
 export default Lox;
