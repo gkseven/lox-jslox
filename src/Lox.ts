@@ -3,12 +3,12 @@ import { readFileSync } from 'node:fs';
 import Scanner from './Scanner';
 
 class Lox {
-  static hadError: boolean = false;
+  private static hadError: boolean = false;
 
-  runFile(filepath: string): void {
+  static runFile(filepath: string): void {
     try {
       const fileContents = readFileSync(filepath);
-      this.run(fileContents.toString());
+      Lox.run(fileContents.toString());
       if (Lox.hadError) process.exit(65);
     } catch (error) {
       const errMsg = (error as Error).message;
@@ -16,7 +16,7 @@ class Lox {
     }
   }
 
-  runPrompt(): void {
+  static runPrompt(): void {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
@@ -25,13 +25,13 @@ class Lox {
 
     rl.prompt();
     rl.on('line', (line) => {
-      this.run(line);
+      Lox.run(line);
       Lox.hadError = false;
       rl.prompt();
     });
   }
 
-  run(source: string): void {
+  private static run(source: string): void {
     const scanner = new Scanner(source);
     const tokens = scanner.scanTokens();
 
