@@ -35,9 +35,9 @@ class Lox {
     const scanner = new Scanner(source);
     const tokens = scanner.scanTokens();
 
-    for (const token in tokens) {
-      console.log(token);
-    }
+    tokens.forEach((token) => {
+      console.log(token.toString());
+    });
   }
 
   static reportError(line: number, where?: string, message?: string) {
