@@ -1,4 +1,4 @@
-import Lox from './Lox';
+import Lox from './lox/Lox';
 
 
 if (process.argv.length > 3) {
