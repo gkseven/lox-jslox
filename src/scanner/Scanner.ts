@@ -1,5 +1,6 @@
-import Lox from './Lox';
-import TokenType from './TokenType';
+import Lox from '../lox/Lox';
+import TokenType from '../token/TokenType';
+import Token from '../token/Token';
 
 class Scanner {
   private readonly source: string;

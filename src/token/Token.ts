@@ -1,3 +1,5 @@
+import TokenType from "./TokenType";
+
 class Token {
   private readonly type: TokenType;
   private readonly lexeme: string;
@@ -20,3 +22,5 @@ class Token {
     return `${this.type} ${this.lexeme} ${this.literal}`;
   }
 }
+
+export default Token;

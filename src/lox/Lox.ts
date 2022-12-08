@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
 import { readFileSync } from 'node:fs';
-import Scanner from './Scanner';
+import Scanner from '../scanner/Scanner';
 
 class Lox {
   private static hadError: boolean = false;
