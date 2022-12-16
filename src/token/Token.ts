@@ -19,7 +19,11 @@ class Token {
   }
 
   toString(): string {
+<<<<<<< HEAD
     return `${TokenType[this.type]} ${this.lexeme} ${this.literal || ""}`;
+=======
+    return `${this.type} ${this.lexeme} ${this.literal}`;
+>>>>>>> 84be6071ef09b6cda4b6910338a4cf9d4383b4f4
   }
 }
 
