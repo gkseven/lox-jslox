@@ -2,13 +2,19 @@ import Lox from '../lox/Lox';
 import TokenType from '../token/TokenType';
 import Token from '../token/Token';
 
+/**
+ * The Scanner breaks the source code into a series of characters and groups
+ * them into meaningful chunks (i.e tokens) that make up the language's grammar.
+ * @constructor
+ * @param {string} source - The source code to be scanned.
+ */
 class Scanner {
-  private readonly source: string;
-  private readonly tokens: Token[] = new Array();
-  private static readonly keywords: Map<string, TokenType> = new Map([]);
-  private start: number = 0;
-  private current: number = 0;
-  private line: number = 1;
+  private readonly source: string; // The source code to be scanned.
+  private readonly tokens: Token[] = new Array(); // The list of tokens encountered.
+  private static readonly keywords: Map<string, TokenType> = new Map([]); // A map of keywords to their respective TokenType.
+  private start: number = 0; // The index of the first character of the lexeme.
+  private current: number = 0; // The index of the current character being scanned.
+  private line: number = 1; // The current line number.
 
   constructor(source: string) {
     this.source = source;
@@ -33,6 +39,11 @@ class Scanner {
     this.keywords.set('while', TokenType.WHILE);
   }
 
+  /**
+   * scanTokens() is the main method of the Scanner class.
+   * It builds a list of tokens by calling scanToken() until the end of the source code is reached.
+   * @returns {Token[]} A list of tokens.
+   */
   scanTokens(): Token[] {
     while (!this.isAtEnd()) {
       this.start = this.current;
@@ -45,10 +56,11 @@ class Scanner {
     return this.tokens;
   }
 
-  private isAtEnd(): boolean {
-    return this.current >= this.source.length;
-  }
-
+  /**
+   * scanToken reads a character, classifies it and proceeds to read an entire lexeme.
+   * The lexeme is then used to determine the TokenType and create a Token
+   * which is then added to the list of tokens @this.tokens encountered so far.
+   */
   private scanToken(): void {
     const c = this.advance();
     switch (c) {
@@ -99,6 +111,7 @@ class Scanner {
         );
         break;
       case '/':
+        // Jump comments.
         if (this.match('/')) {
           while (this.peek() != '\n' && !this.isAtEnd()) this.advance();
         } else {
@@ -125,8 +138,73 @@ class Scanner {
           Lox.reportError(this.line, 'Unexpected character.');
         }
         break;
+    }
   }
-}
+
+  /**
+   * Consumes the next character in the source code if it matches the expected character.
+   * This is uselful for matching two-character tokens like '==' or '!='.
+   * @param {string} expected The character to match.
+   * @returns {boolean} True if the next character matches the expected character, false otherwise.
+   * @private
+   */
+  private match(expected: string): boolean {
+    if (this.isAtEnd()) return false;
+    if (this.source.charAt(this.current) !== expected) return false;
+
+    this.current++;
+    return true;
+  }
+
+  /**
+   * Consumes the next character in the source code and also advances the current index.
+   * @returns {string} The character that was just scanned.
+   * @private
+   */
+  private advance(): string {
+    return this.source.charAt(this.current++);
+  }
+
+  /**
+   * Looks at the next character in the source code without consuming it.
+   * @returns {string} The next character in the source code.
+   * @private
+   */
+  private peek(): string {
+    if (this.isAtEnd()) return '\0';
+    return this.source.charAt(this.current);
+  }
+
+  /**
+   * Looks at the character after the next character in the source code without consuming it.
+   * @returns {string} The character after the next character in the source code.
+   * @private
+   */
+  private peekNext(): string {
+    if (this.current + 1 >= this.source.length) return '\0';
+    return this.source.charAt(this.current + 1);
+  }
+
+  /**
+   * Creates a token with the given type and adds it to the list of tokens.
+   * @param {TokenType} type The type of the token to be created.
+   * @param {string | number | null | undefined} literal The literal value of the token to be created.
+   * @private
+   */
+  private addToken(
+    type: TokenType,
+    literal?: string | number | null | undefined
+  ): void {
+    const text = this.source.substring(this.start, this.current);
+    const token = new Token(type, text, literal, this.line);
+    this.tokens.push(token);
+  }
+
+  /**
+   * Scans a string literal from the source code.
+   * @returns The string literal scanned from the source code.
+   * @private
+   */
   private string(): void {
     while (this.peek() != '"' && !this.isAtEnd()) {
       if (this.peek() == '\n') this.line++;
@@ -139,17 +217,19 @@ class Scanner {
     }
 
     this.advance();
+    // Strip off the surrounding quotes.
     const value = this.source.substring(this.start + 1, this.current - 1);
     this.addToken(TokenType.STRING, value);
   }
 
-  private isDigit(c: string): boolean {
-    return c >= '0' && c <= '9';
-  }
-
+  /**
+   * Consumes a number literal from the source code.
+   * @private
+   */
   private number(): void {
     while (this.isDigit(this.peek())) this.advance();
 
+    // Handle fractional part if encountered.
     if (this.peek() == '.' && this.isDigit(this.peekNext())) {
       this.advance();
       while (this.isDigit(this.peek())) this.advance();
@@ -161,7 +241,12 @@ class Scanner {
     );
   }
 
-  private identifier():void {
+  /**
+   * Consumes an identifier from the source code.
+   * Any lexeme that starts with a letter or an underscore is considered an identifier.
+   * @private
+  */
+  private identifier(): void {
     while (this.isAlphaNumeric(this.peek())) this.advance();
 
     const text = this.source.substring(this.start, this.current);
@@ -169,45 +254,43 @@ class Scanner {
     this.addToken(type);
   }
 
-  private isAlpha(c:string): boolean {
-    return (c >= 'a' && c <= 'z') ||
-           (c >= 'A' && c <= 'Z') ||
-            c == '_';
+  /**
+   * Checks if the given character is a decimal digit.
+   * @param c The character to check.
+   * @returns {boolean} True if the character is a decimal digit, false otherwise.
+   * @private
+   */
+   private isDigit(c: string): boolean {
+    return c >= '0' && c <= '9';
   }
 
-  private isAlphaNumeric(c:string): boolean {
+  /**
+   * Checks if the given character is a letter.
+   * @param c The character to check.
+   * @returns {boolean} True if the character is a letter, false otherwise.
+   * @private
+   */ 
+  private isAlpha(c: string): boolean {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+  }
+
+  /**
+   * Checks if the given character is a letter or a decimal digit.
+   * @param c The character to check.
+   * @returns {boolean} True if the character is a letter or a decimal digit, false otherwise.
+   * @private
+   */
+  private isAlphaNumeric(c: string): boolean {
     return this.isAlpha(c) || this.isDigit(c);
   }
 
-  private match(expected: string): boolean {
-    if (this.isAtEnd()) return false;
-    if (this.source.charAt(this.current) !== expected) return false;
-
-    this.current++;
-    return true;
-  }
-
-  private advance(): string {
-    return this.source.charAt(this.current++);
-  }
-
-  private peek(): string {
-    if (this.isAtEnd()) return '\0';
-    return this.source.charAt(this.current);
-  }
-
-  private peekNext(): string {
-    if (this.current + 1 >= this.source.length) return '\0';
-    return this.source.charAt(this.current + 1);
-  }
-
-  private addToken(
-    type: TokenType,
-    literal?: string | number | null | undefined
-  ): void {
-    const text = this.source.substring(this.start, this.current);
-    const token = new Token(type, text, literal, this.line);
-    this.tokens.push(token);
+  /**
+   * Checks if we've reached the end of the source code.
+   * @returns {boolean} True if we've reached the end of the source code.
+   * @private
+   */
+  private isAtEnd(): boolean {
+    return this.current >= this.source.length;
   }
 }
 
