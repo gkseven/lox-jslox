@@ -1,6 +1,6 @@
-import Lox from '../lox/Lox';
-import TokenType from '../token/TokenType';
-import Token from '../token/Token';
+import Lox from "../lox/Lox";
+import TokenType from "../token/TokenType";
+import Token from "../token/Token";
 
 /**
  * The Scanner breaks the source code into a series of characters and groups
@@ -21,22 +21,22 @@ class Scanner {
   }
 
   static {
-    this.keywords.set('and', TokenType.AND);
-    this.keywords.set('class', TokenType.CLASS);
-    this.keywords.set('else', TokenType.ELSE);
-    this.keywords.set('false', TokenType.FALSE);
-    this.keywords.set('for', TokenType.FOR);
-    this.keywords.set('fun', TokenType.FUN);
-    this.keywords.set('if', TokenType.IF);
-    this.keywords.set('nil', TokenType.NIL);
-    this.keywords.set('or', TokenType.OR);
-    this.keywords.set('print', TokenType.PRINT);
-    this.keywords.set('return', TokenType.RETURN);
-    this.keywords.set('super', TokenType.SUPER);
-    this.keywords.set('this', TokenType.THIS);
-    this.keywords.set('true', TokenType.TRUE);
-    this.keywords.set('var', TokenType.VAR);
-    this.keywords.set('while', TokenType.WHILE);
+    this.keywords.set("and", TokenType.AND);
+    this.keywords.set("class", TokenType.CLASS);
+    this.keywords.set("else", TokenType.ELSE);
+    this.keywords.set("false", TokenType.FALSE);
+    this.keywords.set("for", TokenType.FOR);
+    this.keywords.set("fun", TokenType.FUN);
+    this.keywords.set("if", TokenType.IF);
+    this.keywords.set("nil", TokenType.NIL);
+    this.keywords.set("or", TokenType.OR);
+    this.keywords.set("print", TokenType.PRINT);
+    this.keywords.set("return", TokenType.RETURN);
+    this.keywords.set("super", TokenType.SUPER);
+    this.keywords.set("this", TokenType.THIS);
+    this.keywords.set("true", TokenType.TRUE);
+    this.keywords.set("var", TokenType.VAR);
+    this.keywords.set("while", TokenType.WHILE);
   }
 
   /**
@@ -50,7 +50,7 @@ class Scanner {
       this.scanToken();
     }
 
-    const eof = new Token(TokenType.EOF, '', null, this.line);
+    const eof = new Token(TokenType.EOF, "", null, this.line);
     this.tokens.push(eof);
 
     return this.tokens;
@@ -64,66 +64,66 @@ class Scanner {
   private scanToken(): void {
     const c = this.advance();
     switch (c) {
-      case '(':
+      case "(":
         this.addToken(TokenType.LEFT_PAREN);
         break;
-      case ')':
+      case ")":
         this.addToken(TokenType.RIGHT_PAREN);
         break;
-      case '{':
+      case "{":
         this.addToken(TokenType.LEFT_BRACE);
         break;
-      case '}':
+      case "}":
         this.addToken(TokenType.RIGHT_BRACE);
         break;
-      case ',':
+      case ",":
         this.addToken(TokenType.COMMA);
         break;
-      case '.':
+      case ".":
         this.addToken(TokenType.DOT);
         break;
-      case '-':
+      case "-":
         this.addToken(TokenType.MINUS);
         break;
-      case '+':
+      case "+":
         this.addToken(TokenType.PLUS);
         break;
-      case ';':
+      case ";":
         this.addToken(TokenType.SEMICOLON);
         break;
-      case '*':
+      case "*":
         this.addToken(TokenType.STAR);
         break;
-      case '!':
-        this.addToken(this.match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+      case "!":
+        this.addToken(this.match("=") ? TokenType.BANG_EQUAL : TokenType.BANG);
         break;
-      case '=':
+      case "=":
         this.addToken(
-          this.match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL
+          this.match("=") ? TokenType.EQUAL_EQUAL : TokenType.EQUAL
         );
         break;
-      case '<':
-        this.addToken(this.match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+      case "<":
+        this.addToken(this.match("=") ? TokenType.LESS_EQUAL : TokenType.LESS);
         break;
-      case '>':
+      case ">":
         this.addToken(
-          this.match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER
+          this.match("=") ? TokenType.GREATER_EQUAL : TokenType.GREATER
         );
         break;
-      case '/':
-        // Jump comments.
-        if (this.match('/')) {
-          while (this.peek() != '\n' && !this.isAtEnd()) this.advance();
+      case "/":
+        if (this.match("/")) {
+          // Jump comments.
+          while (this.peek() != "\n" && !this.isAtEnd()) this.advance();
         } else {
           this.addToken(TokenType.SLASH);
         }
         break;
-      case ' ':
-      case '\r':
-      case '\t':
+      case " ":
+      case "\r":
+      case "\t":
         // Ignore whitespace.
         break;
-      case '\n':
+      case "\n":
         this.line++;
         break;
       case '"':
@@ -135,7 +135,7 @@ class Scanner {
         } else if (this.isAlpha(c)) {
           this.identifier();
         } else {
-          Lox.reportError(this.line, 'Unexpected character.');
+          Lox.reportError(this.line, "Unexpected character.");
         }
         break;
     }
@@ -171,7 +171,7 @@ class Scanner {
    * @private
    */
   private peek(): string {
-    if (this.isAtEnd()) return '\0';
+    if (this.isAtEnd()) return "\0";
     return this.source.charAt(this.current);
   }
 
@@ -181,7 +181,7 @@ class Scanner {
    * @private
    */
   private peekNext(): string {
-    if (this.current + 1 >= this.source.length) return '\0';
+    if (this.current + 1 >= this.source.length) return "\0";
     return this.source.charAt(this.current + 1);
   }
 
@@ -207,16 +207,18 @@ class Scanner {
    */
   private string(): void {
     while (this.peek() != '"' && !this.isAtEnd()) {
-      if (this.peek() == '\n') this.line++;
+      if (this.peek() == "\n") this.line++;
       this.advance();
     }
 
     if (this.isAtEnd()) {
-      Lox.reportError(this.line, 'Unterminated string.');
+      Lox.reportError(this.line, "Unterminated string.");
       return;
     }
 
+    // Advance beyond the closing quote
     this.advance();
+
     // Strip off the surrounding quotes.
     const value = this.source.substring(this.start + 1, this.current - 1);
     this.addToken(TokenType.STRING, value);
@@ -230,7 +232,7 @@ class Scanner {
     while (this.isDigit(this.peek())) this.advance();
 
     // Handle fractional part if encountered.
-    if (this.peek() == '.' && this.isDigit(this.peekNext())) {
+    if (this.peek() == "." && this.isDigit(this.peekNext())) {
       this.advance();
       while (this.isDigit(this.peek())) this.advance();
     }
@@ -245,7 +247,7 @@ class Scanner {
    * Consumes an identifier from the source code.
    * Any lexeme that starts with a letter or an underscore is considered an identifier.
    * @private
-  */
+   */
   private identifier(): void {
     while (this.isAlphaNumeric(this.peek())) this.advance();
 
@@ -260,8 +262,8 @@ class Scanner {
    * @returns {boolean} True if the character is a decimal digit, false otherwise.
    * @private
    */
-   private isDigit(c: string): boolean {
-    return c >= '0' && c <= '9';
+  private isDigit(c: string): boolean {
+    return c >= "0" && c <= "9";
   }
 
   /**
@@ -269,9 +271,9 @@ class Scanner {
    * @param c The character to check.
    * @returns {boolean} True if the character is a letter, false otherwise.
    * @private
-   */ 
+   */
   private isAlpha(c: string): boolean {
-    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
   }
 
   /**

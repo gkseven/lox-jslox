@@ -1,6 +1,6 @@
-import * as readline from 'node:readline';
-import { readFileSync } from 'node:fs';
-import Scanner from '../scanner/Scanner';
+import * as readline from "node:readline";
+import { readFileSync } from "node:fs";
+import Scanner from "../scanner/Scanner";
 
 /**
  * The Lox class is the entry point for the Lox interpreter.
@@ -35,10 +35,11 @@ class Lox {
       input: process.stdin,
       output: process.stdout,
     });
-    rl.setPrompt('>> ');
 
+    rl.setPrompt(">> ");
     rl.prompt();
-    rl.on('line', (line) => {
+
+    rl.on("line", (line) => {
       Lox.run(line);
       Lox.hadError = false;
       rl.prompt();
